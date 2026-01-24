@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main style={{ padding: "2rem", lineHeight: 1.7 }}>
@@ -22,10 +24,9 @@ export default function Home() {
         <li>言葉で伝えることを想定し、文章のみでまとめる</li>
       </ul>
 
-      <h2>Goal</h2>
-      <p>
-        我が子に胸を張れるエンジニアになること。
-      </p>
+      <ul>
+        <li><Link href="/knowledge">Knowledge</Link></li>
+      </ul>
     </main>
   );
 }
