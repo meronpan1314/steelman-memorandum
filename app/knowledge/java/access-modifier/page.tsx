@@ -1,8 +1,18 @@
-export default function AccessModifier() {
+import { getMarkdownContent } from "@/lib/markdown";
+
+export default async function AccessModifierPage() {
+    const { meta, contentHtml } = await getMarkdownContent(
+        "contents/knowledge/java/access-modifier.md"
+    );
+
     return (
         <main style={{ padding: "2rem" }}>
-            <h1>Access Modifier</h1>
-            <p>※後で内容を書く</p>
+            <h1>{meta.title}</h1>
+            <p>{meta.date?.toISOString().split('T')[0]}</p>
+
+            <article
+                dangerouslySetInnerHTML={{ __html: contentHtml }}
+            />
         </main>
     );
 }
