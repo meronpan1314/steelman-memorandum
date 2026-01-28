@@ -12,25 +12,47 @@ export default function KnowledgeIndexPage() {
 
         return {
             title: data.title ?? slug[slug.length - 1],
-            date: data.date?.toISOString().split('T')[0] ?? "",
+            date: data.date,
             slug,
         };
     });
+
+    const groupedArticles = articles.reduce((acc, article) => {
+        const category = article.slug[0];
+
+        if (!acc[category]) {
+            acc[category] = [];
+        }
+
+        acc[category].push(article);
+        return acc;
+    }, {} as Record<string, typeof articles>);
 
     return (
         <main style={{ padding: "2rem" }}>
             <h1>Knowledge</h1>
 
-            <ul>
-                {articles.map((article) => (
-                    <li key={article.slug.join("/")}>
-                        <Link href={`/knowledge/${article.slug.join("/")}`}>
-                            {article.title}
-                        </Link>
-                        {article.date && <span>（{article.date}）</span>}
-                    </li>
-                ))}
-            </ul>
+            {Object.entries(groupedArticles).map(([category, items]) => (
+                <section key={category} style={{ marginBottom: "1.5rem" }}>
+                    <h2>
+                        <Link href={`/knowledge/${category}`}>{category}</Link>
+                    </h2>
+
+                    <ul>
+                        {items.map((article) => (
+                            <li key={article.slug.join("/")}>
+                                <Link href={`/knowledge/${article.slug.join("/")}`}>
+                                    {article.title}
+                                </Link>
+                                {article.date && <span>（{article.date}）</span>}
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            ))}
         </main>
+
     );
 }
+
+

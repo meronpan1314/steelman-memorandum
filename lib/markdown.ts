@@ -4,6 +4,8 @@ import matter from "gray-matter";
 import { remark } from "remark";
 import html from "remark-html";
 
+const CONTENT_ROOT = path.join(process.cwd(), "contents/knowledge");
+
 export async function getMarkdownContent(filePath: string) {
     const fullPath = path.join(process.cwd(), filePath);
     const fileContents = fs.readFileSync(fullPath, "utf8");
@@ -16,8 +18,6 @@ export async function getMarkdownContent(filePath: string) {
         contentHtml: processedContent.toString(),
     };
 }
-
-const CONTENT_ROOT = path.join(process.cwd(), "contents/knowledge");
 
 export function getAllMarkdownPaths(
     dir: string = CONTENT_ROOT,
@@ -47,3 +47,34 @@ export function getAllMarkdownPaths(
 
     return results;
 }
+
+export function getMarkdownByCategory(category: string) {
+    return getAllMarkdownMeta().filter(
+        (post) => post.slug[0] === category
+    );
+}
+
+
+export type MarkdownMeta = {
+    slug: string[];
+    title: string;
+    date?: string;
+    meta: { [key: string]: any };
+};
+
+export function getAllMarkdownMeta(): MarkdownMeta[] {
+    const paths = getAllMarkdownPaths();
+
+    return paths.map(({ slug, filePath }) => {
+        const file = fs.readFileSync(filePath, "utf-8");
+        const { data } = matter(file);
+
+        return {
+            slug,
+            title: data.title ?? slug.at(-1),
+            date: data.date,
+            meta: data,
+        };
+    });
+}
+

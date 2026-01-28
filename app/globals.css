@@ -24,3 +24,43 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.has-output {
+  background: #e6f4ff;
+  border-radius: 6px;
+}
+
+.markdown {
+  line-height: 1.8;
+  font-size: 16px;
+}
+
+.markdown h1 {
+  font-size: 2rem;
+  margin-top: 2rem;
+}
+
+.markdown h2 {
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.markdown h3 {
+  font-size: 1.25rem;
+  margin-top: 1.2rem;
+}
+
+.markdown p {
+  margin: 0.75rem 0;
+}
+
+.markdown ul {
+  padding-left: 1.5rem;
+  list-style: disc;
+}
+
+.markdown code {
+  background: #f5f5f5;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}

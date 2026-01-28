@@ -1,5 +1,6 @@
 import { getMarkdownContent } from "@/lib/markdown";
 import { notFound } from "next/navigation";
+import Breadcrumb from "@/components/Breadcrumb";
 
 type Props = {
     params: Promise<{
@@ -12,13 +13,16 @@ export default async function KnowledgePage({ params }: Props) {
         const { slug } = await params;
         const filePath = `contents/knowledge/${slug.join("/")}.md`;
         const { meta, contentHtml } = await getMarkdownContent(filePath);
+        const date = String(meta.date);
 
         return (
             <main style={{ padding: "2rem" }}>
+                <Breadcrumb slug={slug} />
                 <h1>{meta.title}</h1>
-                <p>{meta.date?.toISOString().split('T')[0]}</p>
+                <p>{date}</p>
 
                 <article
+                    className="markdown"
                     dangerouslySetInnerHTML={{ __html: contentHtml }}
                 />
             </main>
