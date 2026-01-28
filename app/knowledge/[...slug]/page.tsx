@@ -17,6 +17,7 @@ export default async function KnowledgePage({ params }: Props) {
 
         return (
             <main style={{ padding: "2rem" }}>
+                <Breadcrumb slug={slug} />
                 <h1>{meta.title}</h1>
                 <p>{date}</p>
 
@@ -24,7 +25,6 @@ export default async function KnowledgePage({ params }: Props) {
                     className="markdown"
                     dangerouslySetInnerHTML={{ __html: contentHtml }}
                 />
-                <Breadcrumb slug={slug} />
             </main>
         );
     } catch {
