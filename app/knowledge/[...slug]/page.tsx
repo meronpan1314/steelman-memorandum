@@ -1,6 +1,7 @@
 import { getMarkdownContent } from "@/lib/markdown";
 import { notFound } from "next/navigation";
 import Breadcrumb from "@/components/Breadcrumb";
+import remarkGfm from "remark-gfm";
 
 type Props = {
     params: Promise<{
