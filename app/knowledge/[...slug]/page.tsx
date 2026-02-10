@@ -12,13 +12,14 @@ type Props = {
 export default async function KnowledgePage({ params }: Props) {
     try {
         const { slug } = await params;
-        const filePath = `contents/knowledge/${slug.join("/")}.md`;
+        const decodedSlug = slug.map(s => decodeURIComponent(s));
+        const filePath = `contents/knowledge/${decodedSlug.join("/")}.md`;
         const { meta, contentHtml } = await getMarkdownContent(filePath);
         const date = String(meta.date);
 
         return (
             <main style={{ padding: "2rem" }}>
-                <Breadcrumb slug={slug} />
+                <Breadcrumb slug={decodedSlug} />
                 <h1>{meta.title}</h1>
                 <p>{date}</p>
 
