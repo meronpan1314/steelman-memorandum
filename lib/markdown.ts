@@ -14,14 +14,14 @@ const CONTENT_ROOT = path.join(process.cwd(), "contents/knowledge");
 // Custom plugin to add titles to code blocks
 function rehypeCodeTitles() {
     return (tree: any) => {
-        visit(tree, "element", (node, index, parent) => {
+        visit(tree, "element", (node: any, index, parent: any) => {
             if (node.tagName === "pre" && node.children && node.children.length > 0) {
                 const codeNode = node.children[0];
                 if (codeNode.tagName === "code" && codeNode.properties && codeNode.properties.className) {
                     const className = codeNode.properties.className;
                     const languageClass = className.find((c: string) => c.startsWith("language-"));
 
-                    if (languageClass) {
+                    if (languageClass && parent && typeof index === "number") {
                         const language = languageClass.replace("language-", "");
                         const title = language.charAt(0).toUpperCase() + language.slice(1);
 
