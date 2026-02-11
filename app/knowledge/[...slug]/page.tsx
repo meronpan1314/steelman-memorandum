@@ -20,7 +20,7 @@ export default async function KnowledgePage({ params }: Props) {
         return (
             <main style={{ padding: "2rem" }}>
                 <Breadcrumb slug={decodedSlug} />
-                <h1>{meta.title}</h1>
+                <h1 className="md_title">{meta.title}</h1>
                 <p>{date}</p>
 
                 <article
