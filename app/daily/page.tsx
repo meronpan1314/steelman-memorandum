@@ -19,28 +19,39 @@ export default function DailyIndexPage() {
         });
 
     return (
-        <main style={{ padding: "2rem" }}>
-            <h1 className="text-2xl font-bold mb-4">Daily Output</h1>
+        <main className="max-w-4xl mx-auto py-12 px-6">
+            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-gray-100 mb-8 border-l-4 border-emerald-500 pl-4">
+                Daily Output
+            </h1>
 
-            <DailyCalendar
-                dailyDates={dates}
-                dailyCountMap={countMap}
-            />
+            <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm mb-12">
+                <DailyCalendar
+                    dailyDates={dates}
+                    dailyCountMap={countMap}
+                />
+            </div>
 
-            <div className="mt-8">
-                <h2 className="text-xl font-bold mb-4 border-b pb-2">All Posts (Newest First)</h2>
-                <ul className="space-y-3">
+            <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 border-b-2 border-emerald-500 pb-2 inline-block">
+                    All Posts <span className="text-sm font-normal text-gray-500 ml-2">(Newest First)</span>
+                </h2>
+                <ul className="grid gap-4">
                     {allPosts.map((post) => (
-                        <li key={post.slug.join("/")} className="border-b border-gray-100 pb-2 last:border-0">
-                            <div className="flex items-center gap-4">
-                                <span className="text-gray-500 font-mono text-sm whitespace-nowrap">{post.date}</span>
-                                <Link
-                                    href={`/knowledge/${post.slug.join("/")}`}
-                                    className="text-blue-600 hover:text-blue-800 hover:underline block truncate"
-                                >
+                        <li key={post.slug.join("/")} className="group">
+                            <Link
+                                href={`/knowledge/${post.slug.join("/")}`}
+                                className="block p-4 rounded-lg bg-gray-50 dark:bg-zinc-900 hover:bg-emerald-50 dark:hover:bg-zinc-800 transition-colors border border-gray-100 dark:border-zinc-800 hover:border-emerald-200 dark:hover:border-emerald-800 shadow-sm hover:shadow-md"
+                            >
+                                <div className="flex justify-between items-start mb-2">
+                                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-xs bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded uppercase tracking-wide">
+                                        Post
+                                    </span>
+                                    <span className="text-gray-400 text-xs font-mono">{post.date}</span>
+                                </div>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
                                     {post.title}
-                                </Link>
-                            </div>
+                                </h3>
+                            </Link>
                         </li>
                     ))}
                 </ul>
