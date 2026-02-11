@@ -16,7 +16,7 @@ interface PaymentService { }
 ``` java
 @Primary
 @Service
-class CreditCardPaymentService implements PaymentService { }
+class samplePaymentService implements PaymentService { }
 ```
 
 ## 3. @Qualifier
@@ -24,5 +24,5 @@ class CreditCardPaymentService implements PaymentService { }
 明示的に指定する。
 
 ``` java
-public OrderService(@Qualifier("payPayPaymentService") PaymentService service)
+public OrderService(@Qualifier("samplePaymentService") PaymentService service)
 ```
