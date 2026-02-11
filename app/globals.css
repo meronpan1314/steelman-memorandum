@@ -94,10 +94,137 @@ article.markdown h3 {
   list-style: disc;
 }
 
-.markdown code {
+/* Code Block Styling (Eclipse-like) */
+.code-block-container {
+  margin: 1.5rem 0;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #ffffff;
+  font-family: var(--font-mono);
+}
+
+.code-block-title {
+  background: linear-gradient(to bottom, #f0f0f0, #e0e0e0);
+  padding: 0.25rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #333;
+  border-bottom: 1px solid #d1d5db;
+  text-transform: capitalize;
+}
+
+article.markdown pre {
+  margin: 0;
+  padding: 1rem;
+  overflow-x: auto;
+  background-color: #ffffff;
+}
+
+article.markdown code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: #333;
+}
+
+/* Inline code (not in pre) */
+p>code,
+li>code {
   background: #f5f5f5;
   padding: 0.2rem 0.4rem;
   border-radius: 4px;
+  color: #e11d48;
+  /* Rose-600 */
+}
+
+/* Syntax Highlighting - Eclipse Light Theme */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-meta-keyword,
+.hljs-doctag,
+.hljs-section {
+  color: #7f0055;
+  font-weight: bold;
+}
+
+.hljs-string,
+.hljs-type,
+.hljs-number,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-quote,
+.hljs-template-tag,
+.hljs-deletion {
+  color: #2a00ff;
+}
+
+.hljs-title,
+.hljs-section {
+  color: #000000;
+  font-weight: bold;
+}
+
+.hljs-comment,
+.hljs-explanation,
+.hljs-quote,
+.hljs-variable {
+  color: #3f7f5f;
+}
+
+.hljs-meta,
+.hljs-tag,
+.hljs-name {
+  color: #000080;
+}
+
+/* Dark Mode Overrides for Code Blocks */
+@media (prefers-color-scheme: dark) {
+  .code-block-container {
+    border-color: #4b5563;
+    background-color: #1e1e1e;
+    /* VS Code dark like */
+  }
+
+  .code-block-title {
+    background: linear-gradient(to bottom, #2d2d2d, #252525);
+    color: #e5e5e5;
+    border-bottom-color: #4b5563;
+  }
+
+  article.markdown pre {
+    background-color: #1e1e1e;
+  }
+
+  article.markdown code {
+    color: #d4d4d4;
+  }
+
+  p>code,
+  li>code {
+    background: #2d2d2d;
+    color: #fb7185;
+    /* Rose-400 */
+  }
+
+  /* Dark Syntax Highlighting */
+  .hljs-keyword,
+  .hljs-selector-tag {
+    color: #c586c0;
+  }
+
+  .hljs-string {
+    color: #ce9178;
+  }
+
+  .hljs-comment {
+    color: #6a9955;
+  }
+
+  .hljs-title,
+  .hljs-section {
+    color: #dcdcaa;
+  }
 }
 
 .markdown table {

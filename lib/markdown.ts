@@ -2,10 +2,50 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { remark } from "remark";
-import html from "remark-html";
+// import html from "remark-html"; // Removed
 import remarkGfm from "remark-gfm";
+import remarkRehype from "remark-rehype";
+import rehypeStringify from "rehype-stringify";
+import rehypeHighlight from "rehype-highlight";
+import { visit } from "unist-util-visit";
 
 const CONTENT_ROOT = path.join(process.cwd(), "contents/knowledge");
+
+// Custom plugin to add titles to code blocks
+function rehypeCodeTitles() {
+    return (tree: any) => {
+        visit(tree, "element", (node, index, parent) => {
+            if (node.tagName === "pre" && node.children && node.children.length > 0) {
+                const codeNode = node.children[0];
+                if (codeNode.tagName === "code" && codeNode.properties && codeNode.properties.className) {
+                    const className = codeNode.properties.className;
+                    const languageClass = className.find((c: string) => c.startsWith("language-"));
+
+                    if (languageClass) {
+                        const language = languageClass.replace("language-", "");
+                        const title = language.charAt(0).toUpperCase() + language.slice(1);
+
+                        const titleNode = {
+                            type: "element",
+                            tagName: "div",
+                            properties: { className: ["code-block-title"] },
+                            children: [{ type: "text", value: title }],
+                        };
+
+                        const containerNode = {
+                            type: "element",
+                            tagName: "div",
+                            properties: { className: ["code-block-container"] },
+                            children: [titleNode, node],
+                        };
+
+                        parent.children[index] = containerNode;
+                    }
+                }
+            }
+        });
+    };
+}
 
 export async function getMarkdownContent(filePath: string) {
     const fullPath = path.join(process.cwd(), filePath);
@@ -14,7 +54,10 @@ export async function getMarkdownContent(filePath: string) {
     const { data, content } = matter(fileContents);
     const processedContent = await remark()
         .use(remarkGfm)
-        .use(html)
+        .use(remarkRehype)
+        .use(rehypeCodeTitles) // Apply custom titles
+        .use(rehypeHighlight) // Apply syntax highlighting
+        .use(rehypeStringify)
         .process(content);
 
     return {
