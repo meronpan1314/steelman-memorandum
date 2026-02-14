@@ -50,11 +50,13 @@ export default function DailyCalendar({
                 const count = dailyCountMap[key];
 
                 return count ? (
-                    <div style={{ fontSize: "0.7rem" }}>✔︎ {count}</div>
+                    <div className="flex justify-center mt-1">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+                    </div>
                 ) : null;
             }}
             tileClassName={({ date }) =>
-                hasOutput(date) ? "has-output" : undefined
+                hasOutput(date) ? "react-calendar__tile--hasActive" : undefined
             }
         />
     );

@@ -7,6 +7,7 @@ import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
+import rehypeSlug from "rehype-slug";
 import { visit } from "unist-util-visit";
 
 const CONTENT_ROOT = path.join(process.cwd(), "contents/knowledge");
@@ -47,22 +48,53 @@ function rehypeCodeTitles() {
     };
 }
 
+export type TOCItem = {
+    level: string;
+    title: string;
+    id: string;
+};
+
 export async function getMarkdownContent(filePath: string) {
     const fullPath = path.join(process.cwd(), filePath);
     const fileContents = fs.readFileSync(fullPath, "utf8");
 
     const { data, content } = matter(fileContents);
+
+    const headings: TOCItem[] = [];
+
+    // Custom plugin to extract headings
+    function rehypeExtractHeadings() {
+        return (tree: any) => {
+            visit(tree, "element", (node: any) => {
+                if (["h2", "h3"].includes(node.tagName) && node.properties.id) {
+                    const title = node.children
+                        .map((child: any) => (child.type === "text" ? child.value : ""))
+                        .join("");
+
+                    headings.push({
+                        level: node.tagName,
+                        title,
+                        id: node.properties.id,
+                    });
+                }
+            });
+        };
+    }
+
     const processedContent = await remark()
         .use(remarkGfm)
         .use(remarkRehype)
+        .use(rehypeSlug) // Generate IDs for headings
         .use(rehypeCodeTitles) // Apply custom titles
         .use(rehypeHighlight) // Apply syntax highlighting
+        .use(rehypeExtractHeadings) // Extract headings
         .use(rehypeStringify)
         .process(content);
 
     return {
-        meta: data,
+        meta: data as { title: string; date?: string; tags?: string[];[key: string]: any },
         contentHtml: processedContent.toString(),
+        toc: headings,
     };
 }
 
@@ -101,11 +133,11 @@ export function getMarkdownByCategory(category: string) {
     );
 }
 
-
 export type MarkdownMeta = {
     slug: string[];
     title: string;
     date?: string;
+    tags?: string[];
     meta: { [key: string]: any };
 };
 
@@ -120,9 +152,65 @@ export function getAllMarkdownMeta(): MarkdownMeta[] {
             slug,
             title: data.title ?? slug.at(-1),
             date: data.date,
+            tags: data.tags,
             meta: data,
         };
     });
+}
+
+// Function to get Previous and Next posts
+export function getPrevNextPosts(currentSlug: string[]) {
+    const allPosts = getAllMarkdownMeta();
+
+    // Sort posts by date (descending) or alphabetically if you prefer
+    // For now, let's just use the order they are returned (filesystem order might vary, so sorting is better)
+    // Let's sort simply by title for a deterministic order if date is missing
+    allPosts.sort((a, b) => {
+        if (a.date && b.date) {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+        }
+        return a.title.localeCompare(b.title);
+    });
+
+    const currentIndex = allPosts.findIndex(
+        (post) => JSON.stringify(post.slug) === JSON.stringify(currentSlug)
+    );
+
+    if (currentIndex === -1) {
+        return { prev: null, next: null };
+    }
+
+    const next = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+    const prev = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+
+    return { prev, next };
+}
+
+// Function to get Related Posts based on tags
+export function getRelatedPosts(currentSlug: string[], tags: string[] = []) {
+    if (!tags || tags.length === 0) return [];
+
+    const allPosts = getAllMarkdownMeta();
+
+    const related = allPosts
+        .filter((post) => {
+            // Exclude current post
+            if (JSON.stringify(post.slug) === JSON.stringify(currentSlug)) return false;
+
+            // Check for intersecting tags
+            const otherTags = post.tags || [];
+            return tags.some((tag) => otherTags.includes(tag));
+        })
+        .map((post) => {
+            // Calculate relevance score (number of matching tags)
+            const otherTags = post.tags || [];
+            const score = tags.filter((tag) => otherTags.includes(tag)).length;
+            return { ...post, score };
+        })
+        .sort((a, b) => b.score - a.score) // Sort by relevance
+        .slice(0, 3); // Return top 3
+
+    return related;
 }
 
 export type DirectoryNode = {
