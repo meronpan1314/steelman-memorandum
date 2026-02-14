@@ -1,6 +1,7 @@
 ---
 title: SQL Server と Oracle の思想差まとめ
 date: "2026-02-05"
+tags: ["db", "oracle", "sql"]
 ---
 
 本ドキュメントでは、SQL Server（T-SQL）と Oracle における
