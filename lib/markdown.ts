@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { remark } from "remark";
-// import html from "remark-html"; // Removed
 import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
@@ -12,7 +11,6 @@ import { visit } from "unist-util-visit";
 
 const CONTENT_ROOT = path.join(process.cwd(), "contents/knowledge");
 
-// Custom plugin to add titles to code blocks
 function rehypeCodeTitles() {
     return (tree: any) => {
         visit(tree, "element", (node: any, index, parent: any) => {
