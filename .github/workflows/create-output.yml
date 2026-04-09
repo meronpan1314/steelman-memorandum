@@ -1,0 +1,47 @@
+name: Create Output from Issue
+
+on: 
+  issues: 
+    types: opened
+
+jobs:
+  create-output:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create branch
+        run: |
+          BRANCH_NAME="output-${{ github.event.issue.number }}"
+          git checkout -b $BRANCH_NAME
+
+      - name: Create markdown file
+        run: |
+          TITLE="${{ github.event.issue.title }}"
+          DATE=$(date +%Y-%m-%d)
+
+          FILE_NAME=$(echo "$TITLE" | sed 's/\[Output\] //g' | tr  ' '-' | tr '[:upper:]' '[:lower:]')
+
+          mkdir -p contents/knowledge/misc
+
+          cp 99_template/temp.md contents/knowledge/misc/$FILE_NAME.md
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "create: ${{ github.event.issue.title }}"
+
+      - name: Push
+        run: |
+          git push origin HEAD
+
+      - name: Create PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          title: "${{ github.event.issue.title }}"
+          body: "Issueより自動生成"
+          branch: output-${{ github.event.issue.number }}
