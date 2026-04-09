@@ -22,7 +22,7 @@ jobs:
           TITLE="${{ github.event.issue.title }}"
           DATE=$(date +%Y-%m-%d)
 
-          FILE_NAME=$(echo "$TITLE" | sed 's/\[Output\] //g' | tr  ' '-' | tr '[:upper:]' '[:lower:]')
+          FILE_NAME=$(echo "$TITLE" | sed 's/\[Output\] //g' | tr  " " "-" | tr '[:upper:]' '[:lower:]')
 
           mkdir -p contents/knowledge/misc
 
