@@ -49,3 +49,5 @@ jobs:
           title: "${{ github.event.issue.title }}"
           body: "Issueより自動生成"
           branch: output-${{ github.event.issue.number }}
+          base: main
+          delete-branch: true
