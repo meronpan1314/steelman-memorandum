@@ -1,7 +1,7 @@
 ---
 name: Output
 about: 新しいアウトプット作成
-title: ''
+title: '[Output] '
 labels: ''
 assignees: ''
 
@@ -10,4 +10,4 @@ assignees: ''
 ## 内容
 
 ## メモ
--
+- 
