@@ -29,27 +29,24 @@ jobs:
       - name: Create markdown file
         run: |
           TITLE="${{ github.event.issue.title }}"
-          DATE=$(date +%Y-%m-%d)
           FILE_NAME=$(echo "$TITLE" | sed 's/\[Output\] //g' | tr  " " "-" | tr '[:upper:]' '[:lower:]')
           mkdir -p contents/knowledge/misc
           cp 99_template/temp.md contents/knowledge/misc/$FILE_NAME.md
 
-      - name: Commit
+      - name: Commit and Push
         run: |
           ls contents/knowledge/misc
           git add .
           git status
           git commit -m "create: ${{ github.event.issue.title }}"
-
-      - name: Push
-        run: |
-          BRANCH_NAME="output-${{ github.event.issue.number }}"
-          git push origin $BRANCH_NAME
+          git push origin HEAD
 
       - name: Create PR
-        uses: peter-evans/create-pull-request@v5
-        with:
-          title: "${{ github.event.issue.title }}"
-          body: "Issueより自動生成"
-          branch: output-${{ github.event.issue.number }}
-          base: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title: "${{ github.event.issue.title }}" \
+            --body: "Issueより自動生成" \
+            --base main \
+            --head "output-${{ github.event.issue.number }}"
