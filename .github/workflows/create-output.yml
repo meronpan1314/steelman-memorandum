@@ -36,13 +36,15 @@ jobs:
 
       - name: Commit
         run: |
+          ls contents/knowledge/misc
           git add .
           git status
           git commit -m "create: ${{ github.event.issue.title }}"
 
       - name: Push
         run: |
-          git push origin HEAD
+          BRANCH_NAME="output-${{ github.event.issue.number }}"
+          git push origin BRANCH_NAME
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v5
