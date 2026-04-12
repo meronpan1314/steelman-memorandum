@@ -44,7 +44,7 @@ jobs:
       - name: Push
         run: |
           BRANCH_NAME="output-${{ github.event.issue.number }}"
-          git push origin BRANCH_NAME
+          git push origin $BRANCH_NAME
 
       - name: Create PR
         uses: peter-evans/create-pull-request@v5
