@@ -1,12 +1,13 @@
 name: Create Output from Issue
 
-on: 
-  issues: 
+on:
+  issues:
     types: opened
 
 permissions:
   contents: write
   pull-requests: write
+  issues: read
 
 jobs:
   create-output:
@@ -16,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Confiigure Git
+      - name: Configure Git
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
@@ -27,17 +28,73 @@ jobs:
           git checkout -b $BRANCH_NAME
 
       - name: Create markdown file
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_CREATED_AT: ${{ github.event.issue.created_at }}
+          ISSUE_LABELS: ${{ toJson(github.event.issue.labels.*.name) }}
         run: |
-          TITLE="${{ github.event.issue.title }}"
-          FILE_NAME=$(echo "$TITLE" | sed 's/\[Output\] //g' | tr  " " "-" | tr '[:upper:]' '[:lower:]')
-          mkdir -p contents/knowledge/misc
-          cp 99_template/temp.md contents/knowledge/misc/$FILE_NAME.md
+          set -euo pipefail
+
+          FILE_NAME="$(
+            printf '%s' "$ISSUE_TITLE" |
+            sed -E 's/^\[Output\][[:space:]]*//'
+          )"
+          FILE_NAME="$(
+            printf '%s' "$FILE_NAME" |
+            sed -E 's#[/\\:*?"<>|]#-#g; s/^[[:space:]]+//; s/[[:space:]]+$//'
+          )"
+
+          if [ -z "$FILE_NAME" ]; then
+            echo "File name is empty. Put the output word after [Output]." >&2
+            exit 1
+          fi
+
+          CATEGORY="$(
+            printf '%s\n' "$ISSUE_BODY" |
+            sed -nE 's/^[[:space:]]*(category|Category|カテゴリ)[[:space:]]*:[[:space:]]*(.+)[[:space:]]*$/\2/p' |
+            head -n 1
+          )"
+
+          if [ -z "$CATEGORY" ]; then
+            CATEGORY="$(
+              printf '%s' "$ISSUE_LABELS" |
+              jq -r '.[] | select(test("^category:")) | sub("^category:[[:space:]]*"; "")' |
+              head -n 1
+            )"
+          fi
+
+          if [ -z "$CATEGORY" ]; then
+            echo "Category is empty. Add 'Category: 15_AI' to the issue body or a 'category:15_AI' label." >&2
+            exit 1
+          fi
+
+          CATEGORY="$(
+            printf '%s' "$CATEGORY" |
+            sed -E 's#[/\\:*?"<>|]#-#g; s/^[[:space:]]+//; s/[[:space:]]+$//'
+          )"
+
+          if ! printf '%s' "$CATEGORY" | grep -Eq '^[0-9]{2}_.+'; then
+            echo "Category must look like '15_AI' or '18_NewCategory': $CATEGORY" >&2
+            exit 1
+          fi
+
+          OUTPUT_DIR="contents/knowledge/$CATEGORY"
+          OUTPUT_FILE="$OUTPUT_DIR/$FILE_NAME.md"
+          ISSUE_DATE="$(date -u -d "$ISSUE_CREATED_AT" '+%Y-%m-%d')"
+
+          mkdir -p "$OUTPUT_DIR"
+          if [ -e "$OUTPUT_FILE" ]; then
+            echo "File already exists: $OUTPUT_FILE" >&2
+            exit 1
+          fi
+
+          sed "s/2026-MM-DD/$ISSUE_DATE/" 99_template/temp.md > "$OUTPUT_FILE"
 
       - name: Commit and Push
         run: |
-          ls contents/knowledge/misc
+          git status --short
           git add .
-          git status
           git commit -m "create: ${{ github.event.issue.title }}"
           git push origin HEAD
 
@@ -45,8 +102,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          cat > "$RUNNER_TEMP/pr-body.md" <<'EOF'
+          Issueより自動生成
+
+          Closes #${{ github.event.issue.number }}
+          EOF
+
           gh pr create \
             --title "${{ github.event.issue.title }}" \
-            --body "Issueより自動生成" \
+            --body-file "$RUNNER_TEMP/pr-body.md" \
             --base main \
             --head "output-${{ github.event.issue.number }}"
