@@ -16,9 +16,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Merge PR and complete issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           BRANCH_NAME: ${{ github.ref_name }}
         run: |
           set -euo pipefail
