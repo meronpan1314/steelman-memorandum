@@ -7,11 +7,11 @@ assignees: ''
 
 ---
 
-Category: 02_Word
+Category: 02_word
 
 <!--
 既存カテゴリ:
-01_Java, 02_Word, 03_API, 04_DB, 05_Server, 06_SpringDI,
+01_Java, 02_word, 03_API, 04_DB, 05_Server, 06_SpringDI,
 07_体験記, 08_Python, 09_Network, 10_Programming, 11_Frontend,
 12_Test, 13_Security, 14_CloudNative, 15_AI, 16_Data, 17_Consulting
 
