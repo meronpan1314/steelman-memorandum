@@ -89,7 +89,16 @@ jobs:
             exit 1
           fi
 
-          sed "s/2026-MM-DD/$ISSUE_DATE/" 99_template/temp.md > "$OUTPUT_FILE"
+          awk -v title="$FILE_NAME" -v date="$ISSUE_DATE" '
+            /^title:[[:space:]]*$/ {
+              print "title: \"" title "\""
+              next
+            }
+            {
+              gsub(/2026-MM-DD/, date)
+              print
+            }
+          ' 99_template/temp.md > "$OUTPUT_FILE"
 
       - name: Commit and Push
         run: |
