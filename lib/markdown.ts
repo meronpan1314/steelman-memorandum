@@ -265,3 +265,18 @@ export function getDirectoryTree(
         .filter((node): node is DirectoryNode => node !== null);
 }
 
+export function getDirectoryNodeBySlug(slug: string[]): DirectoryNode | null {
+    const dir = path.join(CONTENT_ROOT, ...slug);
+
+    if (!fs.existsSync(dir) || !fs.statSync(dir).isDirectory()) {
+        return null;
+    }
+
+    return {
+        name: slug.at(-1) ?? "knowledge",
+        title: slug.at(-1) ?? "knowledge",
+        type: "directory",
+        path: `/knowledge/${slug.join("/")}`,
+        children: getDirectoryTree(dir, `/knowledge/${slug.join("/")}`),
+    };
+}

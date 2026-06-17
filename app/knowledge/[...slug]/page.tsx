@@ -1,9 +1,10 @@
-import { getMarkdownContent, getPrevNextPosts, getRelatedPosts } from "@/lib/markdown";
+import { getDirectoryNodeBySlug, getMarkdownContent, getPrevNextPosts, getRelatedPosts } from "@/lib/markdown";
 import { notFound } from "next/navigation";
 import Breadcrumb from "@/components/Breadcrumb";
 import TableOfContents from "@/components/TableOfContents";
 import ArticleNavigation from "@/components/ArticleNavigation";
 import RelatedArticles from "@/components/RelatedArticles";
+import DirectoryListing from "@/components/DirectoryListing";
 
 type Props = {
     params: Promise<{
@@ -15,6 +16,12 @@ export default async function KnowledgePage({ params }: Props) {
     try {
         const { slug } = await params;
         const decodedSlug = slug.map(s => decodeURIComponent(s));
+        const directory = getDirectoryNodeBySlug(decodedSlug);
+
+        if (directory) {
+            return <DirectoryListing node={directory} />;
+        }
+
         const filePath = `contents/knowledge/${decodedSlug.join("/")}.md`;
         const { meta, contentHtml, toc } = await getMarkdownContent(filePath);
         const date = String(meta.date);
