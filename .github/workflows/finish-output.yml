@@ -16,9 +16,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Merge PR and complete issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -35,6 +32,7 @@ jobs:
 
           PR_NUMBER="$(
             gh pr list \
+              --repo "$GH_REPO" \
               --head "$BRANCH_NAME" \
               --state open \
               --json number \
@@ -46,9 +44,9 @@ jobs:
             exit 1
           fi
 
-          gh pr merge "$PR_NUMBER" --merge --delete-branch
+          gh pr merge "$PR_NUMBER" --repo "$GH_REPO" --merge --delete-branch
 
-          ISSUE_STATE="$(gh issue view "$ISSUE_NUMBER" --json state --jq '.state')"
+          ISSUE_STATE="$(gh issue view "$ISSUE_NUMBER" --repo "$GH_REPO" --json state --jq '.state')"
           if [ "$ISSUE_STATE" != "CLOSED" ]; then
-            gh issue close "$ISSUE_NUMBER" --reason completed
+            gh issue close "$ISSUE_NUMBER" --repo "$GH_REPO" --reason completed
           fi
